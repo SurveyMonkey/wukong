@@ -11,12 +11,12 @@ Wukong offers an ORM query engine for Solr and Solr Cloud.
 
 
 ###Create Solr Collection
-Before you use wukong, make sure you create your collection with its schema on SolrCloud. For example,
+Before you use wukong, make sure you already created your collection on SolrCloud. For example,
 ```
 	curl http://localhost:8080/solr/admin/collections?action=CREATE&name=users&numShards=1&replicationFactor=2
 ```
 
-A sample schema will be like:
+A sample schema can be like:
 ```
 <fields>
 	<uniqueKey>id</uniqueKey>
@@ -36,7 +36,7 @@ from wukong.models import SolrDoc
 
 class User(SolrDoc):
     collection_name = "users"
-    solr_hosts = "localhost:8080"
+    solr_hosts = "localhost:8080,localhost:8081"
 
     def validate_schema_fields(self, fields):
     	pass

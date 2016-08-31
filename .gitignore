@@ -14,7 +14,7 @@ develop-eggs
 .eggs
 .cache
 docs/source/build
-docs/source/apidoc
+Makefile
 
 .coverage
 coverage.xml

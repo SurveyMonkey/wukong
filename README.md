@@ -8,7 +8,7 @@ Usage
 ###Create Solr Collection
 Before you use wukong, make sure you create your collection with its schema on SolrCloud. For example,
 ```
-	curl http://localhost:8080/solr/admin/collections?action=CREATE&name=user&numShards=1&replicationFactor=2
+	curl http://localhost:8080/solr/admin/collections?action=CREATE&name=users&numShards=1&replicationFactor=2
 ```
 
 A sample schema will be like:

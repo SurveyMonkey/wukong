@@ -5,20 +5,25 @@ from setuptools import setup, find_packages
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-version = '0.0.1'
+try:
+    import pypandoc
+    README = pypandoc.convert('README.md', 'rst')
+    CHANGES = pypandoc.convert('CHANGES.md', 'rst')
+except:
+    README = read('README.md')
+    CHANGES = read('CHANGES.md')
 
+version = '0.0.1'
 
 setup(
     name="wukong",
     version=version,
     author="Da Kuang",
-    author_email="dak@surveymonkey.com",
-    maintainer="Da Kuang, Thomas Knickman, Joel Marcotte, Tyler Lubeck",
-    maintainer_email="dak@surveymonkey.com, thomask@surveymonkey.com, joelm@surveymonkey.com, tylerl@surveymonkey.com",
+    author_email="dkuang1980@gmail.com",
     description="An ORM Client library for SolrCloud",
     keywords="solr cloud solrcloud client python orm",
     url="https://github.com/SurveyMonkey/wukong",
-    long_description=read('README.md'),
+    long_description='%s\n\n%s' % (README, CHANGES),
     install_requires=[
         "requests",
         "kazoo",

@@ -36,6 +36,7 @@ from wukong.models import SolrDoc
 
 class User(SolrDoc):
     collection_name = "users"
+    solr_hosts = "localhost:8080"
 
     def validate_schema_fields(self, fields):
     	pass

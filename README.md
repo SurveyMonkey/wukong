@@ -1,5 +1,10 @@
 # Wukong
 
+[![Latest Version](https://badge.fury.io/py/wukong.svg)](https://pypi.python.org/pypi/wukong/)
+[![Travis CI Build Status](https://travis-ci.org/SurveyMonkey/wukong.svg?branch=master)](https://travis-ci.org/SurveyMonkey/wukong)
+[![Coveralls Coverage Status](https://coveralls.io/repos/github/SurveyMonkey/wukong/badge.svg?branch=master)](https://coveralls.io/github/SurveyMonkey/wukong?branch=master)
+
+
 Wukong offers an ORM query engine for Solr and Solr Cloud.
 
 ##Installation

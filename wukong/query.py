@@ -584,8 +584,6 @@ class SolrQueryManager(object):
         :return: document groups of SOLR documents
         :rtype: dict
         """
-        from wukong.models import SolrDocs
-
         result = self.raw(groups=True, **extra)
 
         return result['groups']
@@ -597,8 +595,6 @@ class SolrQueryManager(object):
         :return: facet counts of SOLR documents
         :rtype: dict
         """
-        from wukong.models import SolrDocs
-
         result = self.raw(facets=True, **extra)
 
         return result['facets']

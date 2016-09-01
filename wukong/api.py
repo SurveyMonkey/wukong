@@ -145,7 +145,7 @@ class SolrAPI(object):
         if facets and 'facet_counts' in response:
             data['facets'] = response['facet_counts']
 
-        if 'response' in response and  'docs' in response['response']:
+        if 'response' in response and 'docs' in response['response']:
             response_data = response['response']
             data['docs'] = response_data['docs']
             data['total'] = response_data.get('numFound', len(data['docs']))

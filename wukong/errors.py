@@ -3,7 +3,7 @@ class SolrError(Exception):
     def __init__(self, message=None, status_code=None):
         if isinstance(message, tuple):
             message = message[1]
-            
+
         super(SolrError, self).__init__(message)
         self.status_code = status_code
 

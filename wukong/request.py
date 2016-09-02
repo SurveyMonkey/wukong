@@ -94,11 +94,9 @@ class SolrRequest(object):
                 )
 
                 # Connected to the node, but didn't get a successful response
-                if (
-                    len(self.servers) > 0
-                    and hasattr(response, 'status_code')
-                    and response.status_code != 200
-                ):
+                if (len(self.servers) > 0 and
+                        hasattr(response, 'status_code') and
+                        response.status_code != 200):
                     # try with another node
                     handle_error()
 

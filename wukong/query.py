@@ -29,7 +29,7 @@ class SolrNode(object):
         for arg in args:
             items.append(arg)
 
-        for key, value in six.iteritems(kwargs):
+        for key, value in kwargs.items():
             try:
                 name, operator = key.split("__")
             except ValueError:
@@ -146,7 +146,7 @@ class Comparator(SolrNode):
                     if isinstance(i, six.string_types):
                         new_value.append("\"%s\"" % i)
                     else:
-                        new_value.append(unicode(i))
+                        new_value.append(str(i))
             list_str = "(%s)" % " ".join(new_value)
 
             query_string = "%s:%s" % (key, list_str)
@@ -163,7 +163,7 @@ class Comparator(SolrNode):
                     if isinstance(i, six.string_types):
                         new_value.append("\"%s\"" % i)
                     else:
-                        new_value.append(unicode(i))
+                        new_value.append(str(i))
             list_str = "(%s)" % " ".join(new_value)
 
             query_string = "-%s:%s" % (key, list_str)
@@ -499,7 +499,7 @@ class SolrQueryManager(object):
             params['group.limit'] = self.group_limit
             params.update(dict([
                 ("group.{}".format(k), v) for k, v in
-                self.group_options.iteritems()
+                self.group_options.items()
             ]))
 
         if self.facet_fields:
@@ -508,7 +508,7 @@ class SolrQueryManager(object):
             params['facet.mincount'] = self.mincount
             params.update(dict([
                 ("facet.{}".format(k), v) for k, v in
-                self.facet_options.iteritems()
+                self.facet_options.items()
             ]))
 
         if self.boost_func:

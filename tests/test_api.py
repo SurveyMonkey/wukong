@@ -50,7 +50,7 @@ class TestSolrAPI(unittest.TestCase):
             )
 
         solr_error = cm.exception
-        self.assertEqual(solr_error.message, "Either solr_hosts or solr_collection can not be None")
+        self.assertEqual(str(solr_error), "Either solr_hosts or solr_collection can not be None")
 
     def test_api_constructor__no_zook_host(self):
         api = SolrAPI(
@@ -73,7 +73,7 @@ class TestSolrAPI(unittest.TestCase):
             )
 
         solr_error = cm.exception
-        self.assertEqual(solr_error.message, "Either solr_hosts or solr_collection can not be None")
+        self.assertEqual(str(solr_error), "Either solr_hosts or solr_collection can not be None")
 
     def test_api_update(self):
         with mock.patch('wukong.request.SolrRequest.post') as mock_method:

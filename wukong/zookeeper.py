@@ -32,9 +32,9 @@ class Zookeeper(object):
         active_nodes = set()
         for collection in cluster_state:
             for shard, shard_data in cluster_state[collection]['shards']\
-                    .iteritems():
+                    .items():
                 for replica, replica_data in shard_data['replicas']\
-                        .iteritems():
+                        .items():
                     if replica_data['state'] == 'active':
                         node_url = replica_data['base_url'][:-5]
                         active_nodes.add(node_url)

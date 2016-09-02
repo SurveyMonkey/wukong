@@ -149,7 +149,7 @@ class TestSolrRequest(unittest.TestCase):
             )
 
             solr_error = cm.exception
-            self.assertEqual(solr_error.message, "Test Error" )
+            self.assertEqual(str(solr_error), "Test Error" )
 
     def test_request_request__malformed_response(self):
         client = SolrRequest(["http://localsolr:8080/solr/"])
@@ -181,7 +181,7 @@ class TestSolrRequest(unittest.TestCase):
             )
 
             solr_error = cm.exception
-            self.assertEqual(solr_error.message, "Parsing Error: Malformed Response" )
+            self.assertEqual(str(solr_error), "Parsing Error: Malformed Response" )
 
     def test_request_request__server_down(self):
 
@@ -225,4 +225,4 @@ class TestSolrRequest(unittest.TestCase):
 
 
             solr_error = cm.exception
-            self.assertEqual(solr_error.message, "Server down!" )
+            self.assertEqual(str(solr_error), "Server down!" )

@@ -1,6 +1,7 @@
 from wukong.api import SolrAPI
 from wukong.query import SolrQueryManager
 import wukong.errors as solr_errors
+from six import with_metaclass
 import re
 
 
@@ -139,7 +140,7 @@ class SolrDocs(object):
             commit=commit)
 
 
-class SolrDoc(object):
+class SolrDoc(with_metaclass(SolrDocMetaClass, object)):
     """
     The base class for modeling any type of solr document
     """
@@ -147,8 +148,6 @@ class SolrDoc(object):
     zookeeper_hosts = None
     collection_name = None
     request_timeout = 15
-
-    __metaclass__ = SolrDocMetaClass
 
     @property
     def solr(self):
@@ -370,7 +369,6 @@ class SolrDoc(object):
         :return: whether or not the fields are consistent with SOLR schema
         :rtype: boolean
         """
-
         schema_fields = dict([(field["name"], field) for field
                               in cls.schema.get("fields", {})])
 
@@ -385,7 +383,7 @@ class SolrDoc(object):
                 message="Unique key is not specified"
             )
 
-        for key, field in fields.iteritems():
+        for key, field in fields.items():
             if key in schema_fields:
                 if schema_fields[key].get("multiValued") and \
                         not isinstance(field, list):

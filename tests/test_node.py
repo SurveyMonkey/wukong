@@ -55,7 +55,7 @@ class TestNode(ParameterizedTestCase):
             parsed_query = node.parsed_solr_query
         except SolrError as e:
             if expected_error:
-                assert e.message == expected_error
+                assert str(e) == expected_error
         else:
             assert parsed_query == expected_query
 
@@ -133,7 +133,7 @@ class TestNode(ParameterizedTestCase):
             parsed_query = node.parsed_solr_query
         except SolrError as e:
             if expected_error:
-                assert e.message == expected_error
+                assert str(e) == expected_error
         else:
             assert parsed_query in expected_queries
 
@@ -164,7 +164,7 @@ class TestNode(ParameterizedTestCase):
             parsed_query = node.parsed_solr_query
         except SolrError as e:
             if expected_error:
-                assert e.message == expected_error
+                assert str(e) == expected_error
         else:
             assert parsed_query in expected_queries
 
@@ -210,6 +210,6 @@ class TestNode(ParameterizedTestCase):
             parsed_query = node.parsed_solr_query
         except SolrError as e:
             if expected_error:
-                assert e.message == expected_error
+                assert str(e) == expected_error
         else:
             assert parsed_query == expected_query

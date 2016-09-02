@@ -72,7 +72,7 @@ class TestModels(unittest.TestCase):
         assert doc.id == 100
         assert doc.name == "Test Name"
         assert doc.collection_name == "fake_collection"
-        assert doc.documents.doc_class == FakeSolrDoc
+        assert doc.__class__.documents.doc_class == FakeSolrDoc
         assert doc.unique_key == "id"
         assert (doc.solr.solr_hosts ==
             ['http://fake_host/solr/'])
@@ -468,7 +468,7 @@ class TestModels(unittest.TestCase):
             doc.del_field('id')
 
         schema_error = cm.exception
-        self.assertEqual(schema_error.message, "The unique key id can not be deleted" )
+        self.assertEqual(str(schema_error), "The unique key id can not be deleted" )
 
     @patch('wukong.api.SolrAPI.get_schema', mock_schema)
     def test_models_solrdoc_is_partial_update(self):
@@ -569,7 +569,7 @@ class TestModels(unittest.TestCase):
             })
 
         schema_error = cm.exception
-        self.assertEqual(schema_error.message, "Unique key is not specified" )
+        self.assertEqual(str(schema_error), "Unique key is not specified" )
 
     @patch('wukong.api.SolrAPI.get_schema', mock_schema)
     def test_models_solrdoc_validate_schema_fields_none_pk(self):
@@ -584,7 +584,7 @@ class TestModels(unittest.TestCase):
             })
 
         schema_error = cm.exception
-        self.assertEqual(schema_error.message, "Unique key is not specified" )
+        self.assertEqual(str(schema_error), "Unique key is not specified" )
 
     @patch('wukong.api.SolrAPI.get_schema', mock_schema)
     def test_models_solrdoc_validate_schema_fields_multivalue_error(self):
@@ -599,7 +599,7 @@ class TestModels(unittest.TestCase):
             })
 
         schema_error = cm.exception
-        self.assertEqual(schema_error.message, "test_solrdoc_list is not list type" )
+        self.assertEqual(str(schema_error), "test_solrdoc_list is not list type" )
 
     @patch('wukong.api.SolrAPI.get_schema', mock_schema)
     def test_models_solrdoc_validate_schema_fields_error(self):
@@ -614,7 +614,7 @@ class TestModels(unittest.TestCase):
             })
 
         schema_error = cm.exception
-        self.assertEqual(str(schema_error.message), "Field (test_solrdoc_d3) is not in SOLR schema fields" )
+        self.assertEqual(str(str(schema_error)), "Field (test_solrdoc_d3) is not in SOLR schema fields" )
 
     @patch('wukong.api.SolrAPI.get_schema', mock_schema)
     def test_models_solrdoc_get_data_for_solr_full(self):
@@ -891,7 +891,7 @@ class TestModels(unittest.TestCase):
                 )
             )
         error = cm.exception
-        self.assertEqual(error.message,
+        self.assertEqual(str(error),
             "The types of documents in a container should be the same" )
 
     @patch('wukong.api.SolrAPI.get_schema', mock_schema)

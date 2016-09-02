@@ -15,6 +15,7 @@ develop-eggs
 .cache
 docs/source/build
 Makefile
+virtualenv
 
 .coverage
 coverage.xml

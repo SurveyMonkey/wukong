@@ -13,7 +13,7 @@ except:
     README = read('README.md')
     CHANGES = read('CHANGES.md')
 
-version = '0.0.3'
+version = '0.1.1'
 
 setup(
     name="wukong",
@@ -30,7 +30,7 @@ setup(
         "six>=1.6.1"
     ],
     tests_require=read('test-requirements.txt'),
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
     classifiers=[
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: MIT License",

@@ -71,11 +71,11 @@ class SolrAPI(object):
             except ValueError:
                 return False
 
-            for name, collection in data.iteritems():
+            for name, collection in data.items():
                 shards = collection['shards']
-                for shard, shard_info in shards.iteritems():
+                for shard, shard_info in shards.items():
                     replicas = shard_info['replicas']
-                    for replica, info in replicas.iteritems():
+                    for replica, info in replicas.items():
                         state = info['state']
                         if name == self.solr_collection and state != 'active':
                             return False
@@ -215,4 +215,4 @@ class SolrAPI(object):
                 body=data
             )
         except solr_errors.SolrError as e:
-            raise solr_errors.SolrSchemaUpdateError(fields, message=e.message)
+            raise solr_errors.SolrSchemaUpdateError(fields, message=e.args[0])

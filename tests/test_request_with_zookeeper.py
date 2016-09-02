@@ -114,7 +114,7 @@ class TestSolrZookRequest(unittest.TestCase):
                     )
 
             solr_error = cm.exception
-            self.assertEqual(solr_error.message, "Server down!")
+            self.assertEqual(str(solr_error), "Server down!")
 
     def test_request_request__all_servers_down(self):
 
@@ -143,7 +143,7 @@ class TestSolrZookRequest(unittest.TestCase):
 
                     self.assertEqual(client.current_hosts, [])
                     solr_error = cm.exception
-                    self.assertEqual(solr_error.message,
+                    self.assertEqual(str(solr_error),
                                      "SOLR reporting all nodes as down")
 
                 with self.assertRaises(SolrError) as cm:
@@ -155,7 +155,7 @@ class TestSolrZookRequest(unittest.TestCase):
                     )
 
             solr_error = cm.exception
-            self.assertEqual(solr_error.message,
+            self.assertEqual(str(solr_error),
                              "SOLR reporting all nodes as down")
 
     def test_request_refill_pool(self):
@@ -202,7 +202,7 @@ class TestSolrZookRequest(unittest.TestCase):
                 )
 
             solr_error = cm.exception
-            self.assertEqual(solr_error.message,
+            self.assertEqual(str(solr_error),
                              "SOLR reporting all nodes as down")
 
             # add nodes back to the bool

@@ -1,11 +1,15 @@
 from wukong.zookeeper import Zookeeper
 from requests.exceptions import ConnectionError
 from wukong.errors import SolrError
-import urlparse
 import requests
 import random
 import json
 import time
+
+try:
+    from urlparse import urljoin
+except:
+    from urllib.parse import urljoin
 
 
 def process_response(response):
@@ -78,7 +82,7 @@ class SolrRequest(object):
             self.last_error = None
 
         def make_request(host, path):
-            fullpath = urlparse.urljoin(host, path)
+            fullpath = urljoin(host, path)
             try:
                 response = self.client.request(
                     method,
@@ -90,11 +94,9 @@ class SolrRequest(object):
                 )
 
                 # Connected to the node, but didn't get a successful response
-                if (
-                    len(self.servers) > 0
-                    and hasattr(response, 'status_code')
-                    and response.status_code != 200
-                ):
+                if (len(self.servers) > 0 and
+                        hasattr(response, 'status_code') and
+                        response.status_code != 200):
                     # try with another node
                     handle_error()
 

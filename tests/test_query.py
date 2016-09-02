@@ -19,16 +19,16 @@ class FakeSolrDoc(SolrDoc):
 
 class TestQuery(unittest.TestCase):
     def test_query_init__normal(self):
-    	node = OR(name__eq="Test Name")
+        node = OR(name__eq="Test Name")
         qm = SolrQueryManager(
-        	doc_class=FakeSolrDoc,
-        	node=node,
-        	weight_dict={"name":5},
-        	returned_fields=["name"],
-        	edismax=True,
-        	rows=10,
+            doc_class=FakeSolrDoc,
+            node=node,
+            weight_dict={"name":5},
+            returned_fields=["name"],
+            edismax=True,
+            rows=10,
             start=5,
-        	sort_str="-entity_id"
+            sort_str="-entity_id"
         )
 
         assert qm.doc_class == FakeSolrDoc
@@ -52,18 +52,18 @@ class TestQuery(unittest.TestCase):
         assert qm.sort_str == None
 
     def test_query_order_by(self):
-    	qm = SolrQueryManager(FakeSolrDoc)
+        qm = SolrQueryManager(FakeSolrDoc)
 
-    	qm = qm.sort_by("-test_name")
+        qm = qm.sort_by("-test_name")
 
-    	assert qm.sort_str == "-test_name"
+        assert qm.sort_str == "-test_name"
 
     def test_query_search(self):
-    	qm = SolrQueryManager(FakeSolrDoc)
+        qm = SolrQueryManager(FakeSolrDoc)
 
-    	qm = qm.search("Test", name=10, city=5)
+        qm = qm.search("Test", name=10, city=5)
 
-    	assert qm.weight_dict == {"name":10, "city":5}
+        assert qm.weight_dict == {"name":10, "city":5}
         assert qm.text_keywords == 'Test'
         assert qm.edismax
 
@@ -406,7 +406,7 @@ class TestQuery(unittest.TestCase):
                     docs = qm.all()
 
                 schema_error = cm.exception
-                self.assertEqual(schema_error.message, "Select fetch failed")
+                self.assertEqual(str(schema_error), "Select fetch failed")
 
 
     def test_query_fetch_one_with_one_returned(self):
@@ -576,7 +576,7 @@ class TestQuery(unittest.TestCase):
                     doc = qm.create(id=1, name="Test Name")
 
                 schema_error = cm.exception
-                self.assertEqual(schema_error.message, "The unique key 1 already exists" )
+                self.assertEqual(str(schema_error), "The unique key 1 already exists" )
 
     def test_query_update_normal(self):
         with mock.patch('wukong.api.SolrAPI.select') as mock_select:
@@ -634,4 +634,4 @@ class TestQuery(unittest.TestCase):
                     doc = qm.update(id=1, name="Test Name")
 
                 schema_error = cm.exception
-                self.assertEqual(schema_error.message, "The document with unique key 1 does not exist" )
+                self.assertEqual(str(schema_error), "The document with unique key 1 does not exist" )

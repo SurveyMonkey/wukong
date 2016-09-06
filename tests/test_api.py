@@ -1,7 +1,6 @@
 import mock
 from wukong.api import SolrAPI
 from wukong.errors import *
-import pytest
 import json
 
 try:
@@ -45,8 +44,7 @@ class TestSolrAPI(unittest.TestCase):
         with self.assertRaises(SolrError) as cm:
             SolrAPI(
                 None,
-                "test_collection",
-                "localzook01:2181,localzook02:2181"
+                "test_collection"
             )
 
         solr_error = cm.exception

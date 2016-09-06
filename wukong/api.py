@@ -1,6 +1,7 @@
 import datetime as dt
 import wukong.errors as solr_errors
 from wukong.request import SolrRequest
+from wukong.zookeeper import Zookeeper
 import json
 
 
@@ -25,15 +26,31 @@ class SolrAPI(object):
         :type timeout: int
 
         """
+
+        if solr_hosts is None and zookeeper_hosts is not None:
+            zk = Zookeeper(zookeeper_hosts)
+            solr_hosts = zk.get_active_hosts(collection_name=solr_collection)
+
         if solr_hosts is None or solr_collection is None:
             raise solr_errors.SolrError(
                 "Either solr_hosts or solr_collection can not be None"
             )
 
-        solr_hosts = solr_hosts.split(",")
+        if not isinstance(solr_hosts, list):
+            solr_hosts = solr_hosts.split(",")
+
         if zookeeper_hosts is not None:
+            hostnames, sep, chroot = zookeeper_hosts.rpartition('/')
+
+            # If hostnames is empty then there is no chroot. Set it to empty.
+            if not hostnames:
+                chroot = ''
+            else:
+                chroot = '/%s' % chroot
+
             self.zookeeper_hosts = [
-                "http://%s" % host for host in zookeeper_hosts.split(",")
+                "http://%s%s" % (host, chroot,)
+                for host in zookeeper_hosts.split(",")
             ]
 
         else:

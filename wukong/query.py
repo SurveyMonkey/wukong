@@ -244,7 +244,8 @@ class SolrQueryManager(object):
         boost_query=None,
         bq_weight=1,
         minimum_matches=None,
-        text_keywords=None
+        text_keywords=None,
+        stats_fields=None,
     ):
 
         self.node = node if node else AND()
@@ -268,6 +269,7 @@ class SolrQueryManager(object):
         self.bq_weight = bq_weight
         self.minimum_matches = minimum_matches
         self.text_keywords = text_keywords
+        self.stats_fields = stats_fields
 
     def to_dict(self):
         """
@@ -294,7 +296,8 @@ class SolrQueryManager(object):
             "boost_query": self.boost_query,
             "bq_weight": self.bq_weight,
             "minimum_matches": self.minimum_matches,
-            "text_keywords": self.text_keywords
+            "text_keywords": self.text_keywords,
+            "stats_fields": self.stats_fields,
         }
 
     def filter(self, *args, **kwargs):
@@ -364,6 +367,16 @@ class SolrQueryManager(object):
             "mincount": mincount,
             "facet_group": group,
             "facet_options": kwargs
+        })
+        return SolrQueryManager(**params)
+
+    def stats(self, stats_fields):
+        node = copy.deepcopy(self.node)
+        params = self.to_dict()
+
+        params.update({
+            'node': node,
+            'stats_fields': stats_fields,
         })
         return SolrQueryManager(**params)
 
@@ -510,6 +523,10 @@ class SolrQueryManager(object):
                 ("facet.{}".format(k), v) for k, v in
                 self.facet_options.items()
             ]))
+
+        if self.stats_fields:
+            params['stats'] = "true"
+            params['stats.field'] = self.stats_fields
 
         if self.boost_func:
             params['bf'] = "%s^%s" % (self.boost_func, self.bf_weight)

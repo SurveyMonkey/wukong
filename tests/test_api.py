@@ -62,6 +62,15 @@ class TestSolrAPI(unittest.TestCase):
         assert api.solr_collection == "test_collection"
         assert api.zookeeper_hosts == None
 
+    def test_api_constructor__only_zook_host(self):
+        api = SolrAPI(
+            None,
+            'test_collection',
+            'localzook:2181,localzook:2182/solr'
+        )
+
+        self.assertIsNotNone(api.solr_hosts)
+
     def test_api_constructor__error_no_collection(self):
         with self.assertRaises(SolrError) as cm:
             SolrAPI(

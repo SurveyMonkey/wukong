@@ -1,7 +1,6 @@
 import mock
 from wukong.api import SolrAPI
 from wukong.errors import *
-import pytest
 import json
 
 try:
@@ -45,8 +44,7 @@ class TestSolrAPI(unittest.TestCase):
         with self.assertRaises(SolrError) as cm:
             SolrAPI(
                 None,
-                "test_collection",
-                "localzook01:2181,localzook02:2181"
+                "test_collection"
             )
 
         solr_error = cm.exception
@@ -63,6 +61,15 @@ class TestSolrAPI(unittest.TestCase):
                ["http://localsolr:7070/solr/","http://localsolr:8080/solr/"]
         assert api.solr_collection == "test_collection"
         assert api.zookeeper_hosts == None
+
+    def test_api_constructor__only_zook_host(self):
+        api = SolrAPI(
+            None,
+            'test_collection',
+            'localzook:2181,localzook:2182/solr'
+        )
+
+        self.assertIsNotNone(api.solr_hosts)
 
     def test_api_constructor__error_no_collection(self):
         with self.assertRaises(SolrError) as cm:

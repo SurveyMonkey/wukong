@@ -113,7 +113,13 @@ class SolrAPI(object):
             body=data
         )
 
-    def select(self, query_dict, groups=False, facets=False, **kwargs):
+    def select(self,
+               query_dict,
+               groups=False,
+               facets=False,
+               stats=False,
+               **kwargs
+               ):
         """
         Query documents from SOLR.
 
@@ -144,6 +150,9 @@ class SolrAPI(object):
 
         if facets and 'facet_counts' in response:
             data['facets'] = response['facet_counts']
+
+        if stats and 'stats' in response:
+            data['stats'] = response['stats']
 
         if 'response' in response and 'docs' in response['response']:
             response_data = response['response']

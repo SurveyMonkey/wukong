@@ -268,6 +268,7 @@ class TestQuery(unittest.TestCase):
             .search("Test  Name ", minimum_matches="3<50%", name=10,city=5)\
             .boost_by_func('{!func}geodist()', bf_weight=2)\
             .boost_by_query('id:100', bq_weight=2)\
+            .stats(['country'])\
             .group_by('city', group_limit=2).sort_by("-name")
 
         params = qm.query
@@ -283,9 +284,19 @@ class TestQuery(unittest.TestCase):
         assert params['group'] == 'on'
         assert params['group.ngroups'] == "true"
         assert params['group.field'] == 'city'
+        assert params['stats'] == 'true'
+        assert params['stats.field'] == ['country']
         assert params['bf'] == '{!func}geodist()^2'
         assert params['bq'] == 'id:100^2'
         assert params['mm'] == '3<50%'
+
+    def test_query_with_stats_two_fields(self):
+        qm = SolrQueryManager(FakeSolrDoc)
+        qm = qm.stats(['country', 'city'])
+        params = qm.query
+
+        assert params['stats'] == 'true'
+        assert params['stats.field'] == ['country', 'city']
 
     def test_query_query_chained_regular(self):
         qm = SolrQueryManager(FakeSolrDoc)
@@ -296,6 +307,7 @@ class TestQuery(unittest.TestCase):
             .boost_by_query('id:100', bq_weight=2)\
             .group_by('city', group_limit=2, facet="true")\
             .facet(['country'], mincount=3)\
+            .stats(['country'])\
             .sort_by("-name")
 
         params = qm.query
@@ -312,6 +324,8 @@ class TestQuery(unittest.TestCase):
         assert params['facet'] == 'on'
         assert params['facet.field'] == ['country']
         assert params['facet.mincount'] == 3
+        assert params['stats'] == 'true'
+        assert params['stats.field'] == ['country']
         assert params['bf'] == '{!func}geodist()^2'
         assert params['bq'] == 'id:100^2'
 

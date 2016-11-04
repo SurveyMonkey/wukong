@@ -63,6 +63,9 @@ class Zookeeper(object):
                     collection
                 )
             else:
+                if not isinstance(state_json, str):
+                    state_json = state_json.decode('utf-8')
+
                 state = json.loads(state_json)
 
                 active_hosts[collection] |= _get_hosts_from_state(
@@ -74,6 +77,9 @@ class Zookeeper(object):
             cluster_state_str = zk_client.get('/clusterstate.json')[0]
         except Exception:
             cluster_state_str = '{}'
+
+        if not isinstance(cluster_state_str, str):
+            cluster_state_str = cluster_state_str.decode('utf-8')
 
         cluster_state = json.loads(cluster_state_str)
 

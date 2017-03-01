@@ -5,7 +5,6 @@ env:
   - TOXENV=py33
   - TOXENV=py34
   - TOXENV=pypy
-  - TOXENV=pypy3
   - TOXENV=flake8
 install:
   - travis_retry pip install python-coveralls

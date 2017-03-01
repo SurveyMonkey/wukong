@@ -1,5 +1,9 @@
 #Release Notes
 
+0.2.2
+==========
+- Fix zookeeper cluster state unicode issue
+
 0.2.0
 ==========
 - Zookeeper states for Solr 6

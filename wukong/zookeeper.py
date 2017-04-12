@@ -27,6 +27,13 @@ def _get_hosts_from_state(state):
     return active_nodes
 
 
+def _zk_data_to_dict(data):
+    """json load data retreived with zk_client.get()"""
+    if not isinstance(data, str):
+        data = data.decode('utf-8')
+    return json.loads(data)
+
+
 class Zookeeper(object):
     """
     Retrieve the status of SOLR servers from Zookeeper
@@ -50,7 +57,16 @@ class Zookeeper(object):
             collections = zk_client.get_children('/collections')
         except NoNodeError:
             # No collections have been created on the zookeeper host yet.
+            logger.debug('No collections found')
             collections = []
+
+        # Fetch any potential collection aliases from solr
+        aliases = {}
+        try:
+            aliases = zk_client.get('/aliases.json')[0]  # it's a tuple
+            aliases = _zk_data_to_dict(aliases)
+        except:
+            logger.debug('No /aliases.json file found')
 
         # Handle SOLR 6+ style state.json paths
         for collection in collections:
@@ -63,11 +79,7 @@ class Zookeeper(object):
                     collection
                 )
             else:
-                if not isinstance(state_json, str):
-                    state_json = state_json.decode('utf-8')
-
-                state = json.loads(state_json)
-
+                state = _zk_data_to_dict(state_json)
                 active_hosts[collection] |= _get_hosts_from_state(
                     state.get(collection, {})
                 )
@@ -78,14 +90,21 @@ class Zookeeper(object):
         except Exception:
             cluster_state_str = '{}'
 
-        if not isinstance(cluster_state_str, str):
-            cluster_state_str = cluster_state_str.decode('utf-8')
-
-        cluster_state = json.loads(cluster_state_str)
+        cluster_state = _zk_data_to_dict(cluster_state_str)
 
         for collection_name, state in cluster_state.items():
             hosts = _get_hosts_from_state(state)
             active_hosts[collection_name] |= hosts
+
+        logger.error('Got aliases: %s', aliases)
+        for alias_name, member_string in aliases.get('collection', {}).items():
+            members = member_string.split(',')
+
+            # Only support single member aliases for now, because we need to
+            # be able to fetch schemas.
+            member = members[0]
+
+            active_hosts[alias_name] = active_hosts[member].copy()
 
         zk_client.stop()
 
@@ -102,6 +121,7 @@ class Zookeeper(object):
 
         :returns list[str]: A list of solr nodes in the form `http://hostname`
         """
+        logger.debug('Getting active hosts for collection %s', collection_name)
         active_hosts = self._get_active_hosts()
 
         if collection_name is not None:

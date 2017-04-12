@@ -16,7 +16,7 @@ def _get_hosts_from_state(state):
     :returns: list[str]
     """
     active_nodes = set()
-    for shard, shard_data in state['shards'].items():
+    for shard, shard_data in state.get('shards', {}).items():
         replicas = shard_data['replicas']
         for replica, replica_data in replicas.items():
             if replica_data['state'] == 'active':

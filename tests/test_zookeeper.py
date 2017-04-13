@@ -1,6 +1,7 @@
 from mock import MagicMock, patch
 from wukong.zookeeper import Zookeeper
 import requests
+import json
 
 try:
     import unittest2 as unittest
@@ -23,19 +24,49 @@ class TestZookeeper(unittest.TestCase):
                 return True
 
             def get_children(self, *args, **kwargs):
-                return ['acsvc_test_collection']
+                return ['test_collection_one']
 
             def get(self, *args, **kwargs):
-                return ('{\n  "acsvc_test_collection":{\n    "shards":{"shard1":{\n        "range":"80000000-7fffffff",\n        "state":"active",\n        "replicas":{\n          "core_node1":{\n            "state":"active",\n            "core":"acsvc_test_collection_shard1_replica2",\n            "node_name":"mt3-bmsolr102:8080_solr",\n            "base_url":"http://mt3-bmsolr102:8080/solr"},\n          "core_node2":{\n            "state":"active",\n            "core":"acsvc_test_collection_shard1_replica1",\n            "node_name":"mt3-bmsolr101:8080_solr",\n            "base_url":"http://mt3-bmsolr101:8080/solr",\n            "leader":"true"}}}},\n    "maxShardsPerNode":"1",\n    "router":{"name":"compositeId"},\n    "replicationFactor":"2",\n    "autoAddReplicas":"false"},\n  "psvc_test_collection":{\n    "shards":{"shard1":{\n        "range":"80000000-7fffffff",\n        "state":"active",\n        "replicas":{\n          "core_node1":{\n            "state":"active",\n            "core":"psvc_test_collection_shard1_replica2",\n            "node_name":"mt3-bmsolr102:8080_solr",\n            "base_url":"http://mt3-bmsolr102:8080/solr"},\n          "core_node2":{\n            "state":"active",\n            "core":"psvc_test_collection_shard1_replica1",\n            "node_name":"mt3-bmsolr101:8080_solr",\n            "base_url":"http://mt3-bmsolr101:8080/solr",\n            "leader":"true"}}}},\n    "maxShardsPerNode":"1",\n    "router":{"name":"compositeId"},\n    "replicationFactor":"2",\n    "autoAddReplicas":"false"},\n  "bm_solr_entity_collection":{\n    "shards":{"shard1":{\n        "range":"80000000-7fffffff",\n        "state":"active",\n        "replicas":{\n          "core_node1":{\n            "state":"active",\n            "core":"bm_solr_entity_collection_shard1_replica1",\n            "node_name":"mt3-bmsolr101:8080_solr",\n            "base_url":"http://mt3-bmsolr101:8080/solr",\n            "leader":"true"},\n          "core_node2":{\n            "state":"active",\n            "core":"bm_solr_entity_collection_shard1_replica2",\n            "node_name":"mt3-bmsolr102:8080_solr",\n            "base_url":"http://mt3-bmsolr102:8080/solr"}}}},\n    "maxShardsPerNode":"1",\n    "router":{"name":"compositeId"},\n    "replicationFactor":"2",\n    "autoAddReplicas":"false"},\n  "qb_category_collection":{\n    "shards":{"shard1":{\n        "range":"80000000-7fffffff",\n        "state":"active",\n        "replicas":{\n          "core_node1":{\n            "state":"active",\n            "core":"qb_category_collection_shard1_replica1",\n            "node_name":"mt3-bmsolr101:8080_solr",\n            "base_url":"http://mt3-bmsolr101:8080/solr",\n            "leader":"true"},\n          "core_node2":{\n            "state":"active",\n            "core":"qb_category_collection_shard1_replica2",\n            "node_name":"mt3-bmsolr102:8080_solr",\n            "base_url":"http://mt3-bmsolr102:8080/solr"}}}},\n    "maxShardsPerNode":"1",\n    "router":{"name":"compositeId"},\n    "replicationFactor":"2",\n    "autoAddReplicas":"false"},\n  "mt3_qb_category_collection":{\n    "shards":{"shard1":{\n        "range":"80000000-7fffffff",\n        "state":"active",\n        "replicas":{\n          "core_node1":{\n            "state":"active",\n            "core":"mt3_qb_category_collection_shard1_replica1",\n            "node_name":"mt3-bmsolr102:8080_solr",\n            "base_url":"http://mt3-bmsolr102:8080/solr"},\n          "core_node2":{\n            "state":"active",\n            "core":"mt3_qb_category_collection_shard1_replica2",\n            "node_name":"mt3-bmsolr101:8080_solr",\n            "base_url":"http://mt3-bmsolr101:8080/solr",\n            "leader":"true"}}}},\n    "maxShardsPerNode":"1",\n    "router":{"name":"compositeId"},\n    "replicationFactor":"2",\n    "autoAddReplicas":"false"},\n  "mt3_qb_question_collection":{\n    "shards":{"shard1":{\n        "range":"80000000-7fffffff",\n        "state":"active",\n        "replicas":{\n          "core_node1":{\n            "state":"active",\n            "core":"mt3_qb_question_collection_shard1_replica1",\n            "node_name":"mt3-bmsolr102:8080_solr",\n            "base_url":"http://mt3-bmsolr102:8080/solr"},\n          "core_node2":{\n            "state":"active",\n            "core":"mt3_qb_question_collection_shard1_replica2",\n            "node_name":"mt3-bmsolr101:8080_solr",\n            "base_url":"http://mt3-bmsolr101:8080/solr",\n            "leader":"true"}}}},\n    "maxShardsPerNode":"1",\n    "router":{"name":"compositeId"},\n    "replicationFactor":"2",\n    "autoAddReplicas":"false"},\n  "mt2_qb_category_collection":{\n    "shards":{"shard1":{\n        "range":"80000000-7fffffff",\n        "state":"active",\n        "replicas":{\n          "core_node1":{\n            "state":"active",\n            "core":"mt2_qb_category_collection_shard1_replica1",\n            "node_name":"mt3-bmsolr102:8080_solr",\n            "base_url":"http://mt3-bmsolr102:8080/solr"},\n          "core_node2":{\n            "state":"active",\n            "core":"mt2_qb_category_collection_shard1_replica2",\n            "node_name":"mt3-bmsolr101:8080_solr",\n            "base_url":"http://mt3-bmsolr101:8080/solr",\n            "leader":"true"}}}},\n    "maxShardsPerNode":"1",\n    "router":{"name":"compositeId"},\n    "replicationFactor":"2",\n    "autoAddReplicas":"false"},\n  "mt2_qb_question_collection":{\n    "shards":{"shard1":{\n        "range":"80000000-7fffffff",\n        "state":"active",\n        "replicas":{\n          "core_node1":{\n            "state":"active",\n            "core":"mt2_qb_question_collection_shard1_replica2",\n            "node_name":"mt3-bmsolr102:8080_solr",\n            "base_url":"http://mt3-bmsolr102:8080/solr"},\n          "core_node2":{\n            "state":"active",\n            "core":"mt2_qb_question_collection_shard1_replica1",\n            "node_name":"mt3-bmsolr101:8080_solr",\n            "base_url":"http://mt3-bmsolr101:8080/solr",\n            "leader":"true"}}}},\n    "maxShardsPerNode":"1",\n    "router":{"name":"compositeId"},\n    "replicationFactor":"2",\n    "autoAddReplicas":"false"},\n  "qb_question_test_collection":{\n    "shards":{"shard1":{\n        "range":"80000000-7fffffff",\n        "state":"active",\n        "replicas":{\n          "core_node1":{\n            "state":"active",\n            "core":"qb_question_test_collection_shard1_replica2",\n            "node_name":"mt3-bmsolr101:8080_solr",\n            "base_url":"http://mt3-bmsolr101:8080/solr",\n            "leader":"true"},\n          "core_node2":{\n            "state":"active",\n            "core":"qb_question_test_collection_shard1_replica1",\n            "node_name":"mt3-bmsolr102:8080_solr",\n            "base_url":"http://mt3-bmsolr102:8080/solr"}}}},\n    "maxShardsPerNode":"1",\n    "router":{"name":"compositeId"},\n    "replicationFactor":"2",\n    "autoAddReplicas":"false"}}', )
+                data =  json.dumps({
+                    'test_collection_one':{
+                        'shards':{
+                            'shard1':{
+                                'range': '80000000-7fffffff',
+                                'state': 'active',
+                                'replicas':{
+                                    'core_node1':{
+                                        'state': 'active',
+                                        'core': 'test_collection_one_shard1_replica2',
+                                        'node_name': '127.0.0.1:8080_solr',
+                                        'base_url': 'http://127.0.0.1:8080/solr',
+                                        'leader': 'true',
+                                    },
+                                    'core_node2':{
+                                        'state': 'active',
+                                        'core': 'test_collection_one_shard1_replica1',
+                                        'node_name': '127.0.0.1:9090_solr',
+                                        'base_url': 'http://127.0.0.1:9090/solr',
+                                    }
+                                }
+                            }
+                        },
+                        'maxShardsPerNode': '1',
+                        'router':{'name': 'compositeId'},
+                        'replicationFactor': '2',
+                        'autoAddReplicas': 'false'}
+                    })
+
+                return (data,) # Note that this is a tuple on purpose
 
             def stop(self):
                 return True
 
         mock_kazoo.return_value = MockKazoo()
         result = self.zook_client.get_active_hosts()
-        self.assertEqual(result.sort(),
-                         [u'http://mt3-bmsolr102:8080',
-                          u'http://mt3-bmsolr101:8080'].sort())
+        self.assertEqual(
+            result.sort(),
+            [u'http://127.0.0.1:8080', u'http://127.0.0.1:9090'].sort()
+        )
 
     @patch('kazoo.client.KazooClient')
     def test_no_clusterstate_file(self, mock_kazoo):
@@ -82,3 +113,66 @@ class TestZookeeper(unittest.TestCase):
         mock_kazoo.return_value = MockKazoo()
         result = self.zook_client.get_active_hosts()
         self.assertEqual(result, [])
+
+    @patch('kazoo.client.KazooClient')
+    def test_get_aliases(self, mock_kazoo):
+        class MockKazoo(object):
+            def __init__(self):
+                pass
+
+            def start(self, *args, **kwargs):
+                return True
+
+            def get_children(self, *args, **kwargs):
+                return ['test_collection_one']
+
+            def get(self, *args, **kwargs):
+                data = ''
+                if args and args[0] == '/aliases.json':
+                    data = json.dumps({
+                        'collection': {
+                            'my_alias': 'test_collection_one',
+                        }
+                    })
+                else:
+                    data = json.dumps({
+                        'test_collection_one':{
+                            'shards':{
+                                'shard1':{
+                                    'range': '80000000-7fffffff',
+                                    'state': 'active',
+                                    'replicas':{
+                                        'core_node1':{
+                                            'state': 'active',
+                                            'core': 'test_collection_one_shard1_replica2',
+                                            'node_name': '127.0.0.1:8080_solr',
+                                            'base_url': 'http://127.0.0.1:8080/solr',
+                                            'leader': 'true',
+                                        },
+                                        'core_node2':{
+                                            'state': 'active',
+                                            'core': 'test_collection_one_shard1_replica1',
+                                            'node_name': '127.0.0.1:9090_solr',
+                                            'base_url': 'http://127.0.0.1:9090/solr',
+                                        }
+                                    }
+                                }
+                            },
+                            'maxShardsPerNode': '1',
+                            'router':{'name': 'compositeId'},
+                            'replicationFactor': '2',
+                            'autoAddReplicas': 'false'}
+                        })
+
+                return (data,) # Note that this is a tuple on purpose
+
+            def stop(self):
+                return True
+
+        mock_kazoo.return_value = MockKazoo()
+        result = self.zook_client._get_active_hosts()
+        print(result)
+        self.assertEqual(
+            result['test_collection_one'],
+            result['my_alias']
+        )

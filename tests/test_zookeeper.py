@@ -27,34 +27,37 @@ class TestZookeeper(unittest.TestCase):
                 return ['test_collection_one']
 
             def get(self, *args, **kwargs):
-                data =  json.dumps({
-                    'test_collection_one':{
-                        'shards':{
-                            'shard1':{
-                                'range': '80000000-7fffffff',
-                                'state': 'active',
-                                'replicas':{
-                                    'core_node1':{
-                                        'state': 'active',
-                                        'core': 'test_collection_one_shard1_replica2',
-                                        'node_name': '127.0.0.1:8080_solr',
-                                        'base_url': 'http://127.0.0.1:8080/solr',
-                                        'leader': 'true',
-                                    },
-                                    'core_node2':{
-                                        'state': 'active',
-                                        'core': 'test_collection_one_shard1_replica1',
-                                        'node_name': '127.0.0.1:9090_solr',
-                                        'base_url': 'http://127.0.0.1:9090/solr',
+                if args and args[0] == '/aliases.json':
+                    data = None
+                else:
+                    data =  json.dumps({
+                        'test_collection_one':{
+                            'shards':{
+                                'shard1':{
+                                    'range': '80000000-7fffffff',
+                                    'state': 'active',
+                                    'replicas':{
+                                        'core_node1':{
+                                            'state': 'active',
+                                            'core': 'test_collection_one_shard1_replica2',
+                                            'node_name': '127.0.0.1:8080_solr',
+                                            'base_url': 'http://127.0.0.1:8080/solr',
+                                            'leader': 'true',
+                                        },
+                                        'core_node2':{
+                                            'state': 'active',
+                                            'core': 'test_collection_one_shard1_replica1',
+                                            'node_name': '127.0.0.1:9090_solr',
+                                            'base_url': 'http://127.0.0.1:9090/solr',
+                                        }
                                     }
                                 }
-                            }
-                        },
-                        'maxShardsPerNode': '1',
-                        'router':{'name': 'compositeId'},
-                        'replicationFactor': '2',
-                        'autoAddReplicas': 'false'}
-                    })
+                            },
+                            'maxShardsPerNode': '1',
+                            'router':{'name': 'compositeId'},
+                            'replicationFactor': '2',
+                            'autoAddReplicas': 'false'}
+                        })
 
                 return (data,) # Note that this is a tuple on purpose
 

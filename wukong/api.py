@@ -1,8 +1,11 @@
+import logging
 import datetime as dt
 import wukong.errors as solr_errors
 from wukong.request import SolrRequest
 from wukong.zookeeper import Zookeeper
 import json
+
+logger = logging.getLogger(__name__)
 
 
 class SolrAPI(object):
@@ -28,10 +31,15 @@ class SolrAPI(object):
         """
 
         if solr_hosts is None and zookeeper_hosts is not None:
+            logger.info(
+                'Getting solr hosts from zookeeper for collection %s',
+                solr_collection
+            )
             zk = Zookeeper(zookeeper_hosts)
             solr_hosts = zk.get_active_hosts(collection_name=solr_collection)
 
         if solr_hosts is None or solr_collection is None:
+            logger.error('Neither solr_hosts nor solr_collection has been set')
             raise solr_errors.SolrError(
                 "Either solr_hosts or solr_collection can not be None"
             )
@@ -48,14 +56,23 @@ class SolrAPI(object):
             else:
                 chroot = '/%s' % chroot
 
+            logger.debug('Using solr via zookeeper at chroot %s', chroot)
+
             self.zookeeper_hosts = [
                 "http://%s%s" % (host, chroot,)
                 for host in zookeeper_hosts.split(",")
             ]
 
+            logger.info(
+                'Connected to zookeeper hosts at %s',
+                self.zookeeper_hosts
+            )
+
         else:
+            logger.debug('Not using zookeeper for SolrCloud')
             self.zookeeper_hosts = None
 
+        logger.info('Connected to solr hosts %s', solr_hosts)
         self.solr_hosts = ["http://%s/solr/" % host for host in solr_hosts]
 
         self.solr_collection = solr_collection
@@ -81,6 +98,7 @@ class SolrAPI(object):
         try:
             response = self.client.get('zookeeper', params)
         except solr_errors.SolrError:
+            logger.exception('Failed to check zookeeper')
             return False
         else:
             try:

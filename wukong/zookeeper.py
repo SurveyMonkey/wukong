@@ -63,8 +63,9 @@ class Zookeeper(object):
         # Fetch any potential collection aliases from solr
         aliases = {}
         try:
-            aliases = zk_client.get('/aliases.json')[0]  # it's a tuple
-            aliases = _zk_data_to_dict(aliases)
+            aliases = _zk_data_to_dict(zk_client.get('/aliases.json')[0])
+            if aliases is None:  # If there are no aliases, we'll get None
+                aliases = {}
         except:
             logger.debug('No /aliases.json file found')
 

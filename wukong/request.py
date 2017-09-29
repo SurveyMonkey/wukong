@@ -65,14 +65,12 @@ class SolrRequest(object):
             return make_request(host, path)
 
         headers = {'content-type': 'application/json'}
-        extraparams = {'wt': 'json',
-                       'omitHeader': 'true',
-                       'json.nl': 'map'}
+        resultparams = {'wt': 'json',
+                        'omitHeader': 'true',
+                        'json.nl': 'map'}
 
-        if params is None:
-            params = {}
-
-        params.update(extraparams)
+        if params is not None:
+            resultparams.update(params)
 
         # if there hasn't been an error in 5 minutes, reset the solr_hosts
         if self.last_error is not None and \
@@ -87,7 +85,7 @@ class SolrRequest(object):
                 response = self.client.request(
                     method,
                     fullpath,
-                    params=params,
+                    params=resultparams,
                     headers=headers,
                     data=body,
                     timeout=self.timeout

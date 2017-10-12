@@ -79,11 +79,41 @@ class TestSolrRequest(unittest.TestCase):
 
             assert response == {'fake_data': 'fake_value'}
 
+    def test_request_request__omitHeder_is_false(self):
+        client = SolrRequest(["http://localsolr:8080/solr/"])
+
+        with mock.patch('requests.sessions.Session.request') as mock_request:
+            fake_response = Response()
+            fake_response.status_code = 200
+            fake_response.text = json.dumps({'fake_data': 'fake_value'})
+            mock_request.return_value = fake_response
+            response = client.request(
+                'fake_path',
+                {"fake_params": "fake_value", 'omitHeader': 'false'},
+                'GET',
+                body={"fake_body": "fake_value"}
+            )
+
+            mock_request.assert_called_once_with(
+                'GET', 'http://localsolr:8080/solr/fake_path',
+                params={
+                    "fake_params": "fake_value",
+                    'wt': 'json',
+                    'omitHeader': 'false',
+                    'json.nl': 'map'
+                },
+                headers={'content-type': 'application/json'},
+                data={"fake_body": "fake_value"},
+                timeout=15
+            )
+
+            assert response == {'fake_data': 'fake_value'}
+
     def test_request_request__empty_params(self):
         client = SolrRequest(["http://localsolr:8080/solr/"])
 
         with mock.patch('requests.sessions.Session.request') as mock_request:
-            fake_response =  Response()
+            fake_response = Response()
             fake_response.status_code = 200
             fake_response.text = json.dumps({'fake_data': 'fake_value'})
             mock_request.return_value = fake_response

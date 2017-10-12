@@ -1,4 +1,13 @@
+
 #Release Notes
+
+0.4.0
+==========
+- Add ability to update extraparams like omitHeader for solr requests
+
+0.3.1
+==========
+- Collection alias support
 
 0.2.2
 ==========

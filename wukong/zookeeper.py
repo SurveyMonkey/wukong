@@ -38,8 +38,9 @@ class Zookeeper(object):
     """
     Retrieve the status of SOLR servers from Zookeeper
     """
-    def __init__(self, hosts):
+    def __init__(self, hosts, connection_timeout=5):
         self.hosts = hosts
+        self.connection_timeout = connection_timeout
 
     def _get_active_hosts(self):
         active_hosts = defaultdict(set)
@@ -49,7 +50,7 @@ class Zookeeper(object):
                 hosts=self.hosts,
                 read_only=True
             )
-            zk_client.start(timeout=5)
+            zk_client.start(timeout=self.connection_timeout)
         except Exception:
             return active_hosts
 

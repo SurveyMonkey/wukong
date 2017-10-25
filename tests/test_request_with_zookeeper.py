@@ -39,7 +39,8 @@ class TestSolrZookRequest(unittest.TestCase):
             'fake_path', {"fake_param": "fake_value"}, 'POST',
             body={
                 "fake_data": "fake_value"
-            }
+            },
+            headers=None
         )
 
     def test_request_get(self):
@@ -56,7 +57,7 @@ class TestSolrZookRequest(unittest.TestCase):
             )
 
         mock_request.assert_called_once_with(
-            'fake_path', {"fake_param": "fake_value"}, 'GET'
+            'fake_path', {"fake_param": "fake_value"}, 'GET', headers=None
         )
 
     def test_request_request__server_down(self):
@@ -114,7 +115,7 @@ class TestSolrZookRequest(unittest.TestCase):
                     )
 
             solr_error = cm.exception
-            self.assertEqual(str(solr_error), "Server down!")
+            self.assertEqual(str(solr_error), "Unable to fetch from any SOLR nodes")
 
     def test_request_request__all_servers_down(self):
 
@@ -144,7 +145,7 @@ class TestSolrZookRequest(unittest.TestCase):
                     self.assertEqual(client.current_hosts, [])
                     solr_error = cm.exception
                     self.assertEqual(str(solr_error),
-                                     "SOLR reporting all nodes as down")
+                                     "Unable to fetch from any SOLR nodes")
 
                 with self.assertRaises(SolrError) as cm:
                     response2 = client.request(
@@ -156,60 +157,42 @@ class TestSolrZookRequest(unittest.TestCase):
 
             solr_error = cm.exception
             self.assertEqual(str(solr_error),
-                             "SOLR reporting all nodes as down")
-
-    def test_request_refill_pool(self):
-
-        client = SolrRequest(["http://localsolr:7070/solr/","http://localsolr:8080/solr/"],
-                             zookeeper_hosts=["http://localzook:2181", "http://localzook:2181"])
-
-        # simulate an empty pool and a 5 minute old error
-        client.current_hosts = ["http://localsolr:8080/solr/"]
-        client.last_error = time.time() - 5
-
-        with mock.patch('requests.sessions.Session.request') as mock_request:
-            fake_response =  Response()
-            fake_response.status_code = 200
-            fake_response.text = json.dumps({'fake_data': 'fake_value'})
-            mock_request.return_value = fake_response
-            response = client.request(
-                'fake_path',
-                {"fake_params": "fake_value"},
-                'GET',
-                body={"fake_body": "fake_value"}
-            )
-
-            self.assertEqual(client.current_hosts, client.master_hosts)
+                             "Unable to fetch from any SOLR nodes")
 
     def test_request_no_active_pool(self):
-
-        client = SolrRequest(["http://localsolr:7070/solr/","http://localsolr:8080/solr/"],
-                             zookeeper_hosts=["http://localzook:2181", "http://localzook:2181"])
-        client.current_hosts = ''
-        # simulate an empty pool
-
         with mock.patch('requests.sessions.Session.request') as mock_request:
             fake_response =  Response()
             fake_response.status_code = 200
             fake_response.text = json.dumps({'fake_data': 'fake_value'})
             mock_request.return_value = fake_response
-            with self.assertRaises(SolrError) as cm:
+
+            with mock.patch('wukong.zookeeper.Zookeeper.get_active_hosts') as mock_zookeeper:
+                def get_active_hosts():
+                    return []
+
+                mock_zookeeper.side_effect = get_active_hosts
+                client = SolrRequest(["http://localsolr:7070/solr/","http://localsolr:8080/solr/"],
+                                     zookeeper_hosts=["http://localzook:2181", "http://localzook:2181"])
+                with self.assertRaises(SolrError) as cm:
+                    response = client.request(
+                        'fake_path',
+                        {"fake_params": "fake_value"},
+                        'GET',
+                        body={"fake_body": "fake_value"}
+                    )
+
+                solr_error = cm.exception
+                self.assertEqual(str(solr_error),
+                                 "Unable to fetch from any SOLR nodes")
+
+            with mock.patch('wukong.zookeeper.Zookeeper.get_active_hosts') as mock_zookeeper:
+                def get_active_hosts():
+                    return ["http://localsolr:7070/solr/","http://localsolr:8080/solr/"]
+
+                mock_zookeeper.side_effect = get_active_hosts
                 response = client.request(
                     'fake_path',
                     {"fake_params": "fake_value"},
                     'GET',
                     body={"fake_body": "fake_value"}
                 )
-
-            solr_error = cm.exception
-            self.assertEqual(str(solr_error),
-                             "SOLR reporting all nodes as down")
-
-            # add nodes back to the bool
-            client.current_hosts = ["http://localsolr:7070/solr/","http://localsolr:8080/solr/"]
-            response = client.request(
-                'fake_path',
-                {"fake_params": "fake_value"},
-                'GET',
-                body={"fake_body": "fake_value"}
-            )

@@ -32,12 +32,11 @@ class SolrRequest(object):
     Handle requests to SOLR and response from SOLR
     """
 
-    REFRESH_FREQUENCY = 2
-
-    def __init__(self, solr_hosts, zookeeper_hosts=None, timeout=15):
+    def __init__(self, solr_hosts, zookeeper_hosts=None, timeout=15, refresh_frequency=2):
         self.client = requests.Session()
         self.master_hosts = solr_hosts
         self.zookeeper_hosts = zookeeper_hosts
+        self.refresh_frequency = refresh_frequency
         self.servers = []
         self.timeout = timeout
         self.current_hosts = self.master_hosts  # Backwards Compat
@@ -66,7 +65,7 @@ class SolrRequest(object):
                     logger.error('Unable to find any solr nodes to make requests to')
                     raise SolrError("zookeeper reporting all SOLR nodes as down")
                 return True
-            except Exception as e:
+            except Exception:
                 logger.exception('Failing to retrieve new SOLR hosts from zookeeper')
         return False
 
@@ -84,12 +83,12 @@ class SolrRequest(object):
         if (self.zookeeper and
             not is_retry and
             self._last_request and
-            ((time.time() - self._last_request) / 60) > self.REFRESH_FREQUENCY):
+            ((time.time() - self._last_request) / 60) > self.refresh_frequency):
             self.attempt_zookeeper_refresh()
 
         request_params = {
             'wt': 'json',
-            'omitHeader': True,
+            'omitHeader': 'true',
             'json.nl': 'map'
         }
         if params:
@@ -106,6 +105,7 @@ class SolrRequest(object):
                 )
 
                 self._last_request = time.time()
+
                 response = self.client.request(
                     method,
                     full_path,

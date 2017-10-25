@@ -31,35 +31,46 @@ class SolrRequest(object):
     """
     Handle requests to SOLR and response from SOLR
     """
+
+    REFRESH_FREQUENCY = 2
+
     def __init__(self, solr_hosts, zookeeper_hosts=None, timeout=15):
         self.client = requests.Session()
         self.master_hosts = solr_hosts
+        self.zookeeper_hosts = zookeeper_hosts
         self.servers = []
         self.timeout = timeout
-
-        self.last_error = None
-        # time to revert to old host list (in minutes) after an error
-        self.check_hosts = 5
-
-        if zookeeper_hosts is not None:
-            logger.debug('Fetching solr from zookeeper')
-            self.zookeeper = Zookeeper(zookeeper_hosts)
-            self.master_hosts = self.zookeeper.get_active_hosts()
-            logger.info(
-                'Got solr nodes from zookeeper: %s',
-                ','.join(self.master_hosts)
-            )
-        else:
-            self.zookeeper = None
-
-        if not self.master_hosts:
-            logger.error('Unable to find any solr nodes to make requests to')
-            raise SolrError("SOLR reporting all nodes as down")
-
         self.current_hosts = self.master_hosts  # Backwards Compat
+        self._zookeeper = None
+        self._last_request = None
+        self.attempt_zookeeper_refresh()
 
+    @property
+    def zookeeper(self):
+        if self._zookeeper is None and self.zookeeper_hosts:
+            self._zookeeper = Zookeeper(self.zookeeper_hosts)
+        return self._zookeeper
 
-    def request(self, path, params, method, body=None, headers=None):
+    def attempt_zookeeper_refresh(self):
+        zk = self.zookeeper
+        if zk:
+            logger.debug('Fetching solr from zookeeper')
+            try:
+                self.master_hosts = zk.get_active_hosts()
+                self.current_hosts = self.master_hosts  # backward compat
+                logger.info(
+                    'Got solr nodes from zookeeper: %s',
+                    ','.join(self.master_hosts)
+                )
+                if not self.master_hosts:
+                    logger.error('Unable to find any solr nodes to make requests to')
+                    raise SolrError("zookeeper reporting all SOLR nodes as down")
+                return True
+            except Exception as e:
+                logger.exception('Failing to retrieve new SOLR hosts from zookeeper')
+        return False
+
+    def request(self, path, params, method, body=None, headers=None, is_retry=False):
         """
         Prepare data and send request to SOLR servers
         """
@@ -69,6 +80,12 @@ class SolrRequest(object):
         if headers:
             request_headers.update(headers)
 
+        # Refresh our list of hosts
+        if (self.zookeeper and
+            not is_retry and
+            self._last_request and
+            ((time.time() - self._last_request) / 60) > self.REFRESH_FREQUENCY):
+            self.attempt_zookeeper_refresh()
 
         request_params = {
             'wt': 'json',
@@ -79,7 +96,7 @@ class SolrRequest(object):
             request_params.update(params)
 
         response = None
-        for host in self.master_hosts:
+        for host in random.sample(self.master_hosts):
             full_path = urljoin(host, path)
             try:
                 logger.debug(
@@ -88,6 +105,7 @@ class SolrRequest(object):
                     path
                 )
 
+                self._last_request = time.time()
                 response = self.client.request(
                     method,
                     full_path,
@@ -125,6 +143,11 @@ class SolrRequest(object):
                 )
 
         if not response:
+            if not is_retry:
+                refreshed = self.attempt_zookeeper_refresh()
+                if refreshed:
+                    return self.request(path, params, method, body=body,
+                                        headers=headers, is_retry=True)
             raise SolrError('Unable to fetch from any SOLR nodes')
 
         return process_response(response)

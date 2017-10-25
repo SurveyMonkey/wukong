@@ -196,3 +196,33 @@ class TestSolrZookRequest(unittest.TestCase):
                     'GET',
                     body={"fake_body": "fake_value"}
                 )
+
+    def test_should_refresh(self):
+        with mock.patch('requests.sessions.Session.request') as mock_request:
+            fake_response =  Response()
+            fake_response.status_code = 200
+            fake_response.text = json.dumps({'fake_data': 'fake_value'})
+            mock_request.return_value = fake_response
+
+            with mock.patch('wukong.zookeeper.Zookeeper.get_active_hosts') as mock_zookeeper:
+                def get_empty_active_hosts():
+                    return []
+
+                def get_active_hosts():
+                    return ["http://localsolr:7070/solr/","http://localsolr:8080/solr/"]
+
+                mock_zookeeper.side_effect = get_empty_active_hosts
+                client = SolrRequest(["http://localsolr:7070/solr/","http://localsolr:8080/solr/"],
+                                     zookeeper_hosts=["http://localzook:2181", "http://localzook:2181"])
+
+                mock_zookeeper.side_effect = get_active_hosts
+                assert client.master_hosts == []
+                client._last_request = time.time() - (client.refresh_frequency * 1000 + 3000)
+                response = client.request(
+                    'fake_path',
+                    {"fake_params": "fake_value"},
+                    'GET',
+                    body={"fake_body": "fake_value"},
+                    headers={'foo': 'bar'}
+                )
+                assert client.master_hosts == get_active_hosts()

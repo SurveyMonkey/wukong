@@ -96,7 +96,7 @@ class SolrRequest(object):
             request_params.update(params)
 
         response = None
-        for host in random.sample(self.master_hosts):
+        for host in random.sample(self.master_hosts, len(self.master_hosts)):
             full_path = urljoin(host, path)
             try:
                 logger.debug(

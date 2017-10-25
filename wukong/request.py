@@ -10,15 +10,13 @@ import time
 
 try:
     from urlparse import urljoin
-except ImportError:
+except ImportError: # pragma: no cover
     from urllib.parse import urljoin
 
 logger = logging.getLogger()
 
 
 def process_response(response):
-    if response.status_code != 200:
-        raise SolrError(response.reason)
     try:
         response_content = json.loads(response.text)
     except Exception:

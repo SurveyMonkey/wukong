@@ -226,3 +226,4 @@ class TestSolrZookRequest(unittest.TestCase):
                     headers={'foo': 'bar'}
                 )
                 assert client.master_hosts == get_active_hosts()
+                assert client.current_hosts == client.master_hosts

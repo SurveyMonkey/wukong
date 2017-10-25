@@ -66,7 +66,7 @@ class Zookeeper(object):
             aliases = _zk_data_to_dict(zk_client.get('/aliases.json')[0])
             if aliases is None:  # If there are no aliases, we'll get None
                 aliases = {}
-        except:
+        except Exception:
             logger.debug('No /aliases.json file found')
 
         # Handle SOLR 6+ style state.json paths

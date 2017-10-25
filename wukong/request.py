@@ -10,17 +10,18 @@ import time
 
 try:
     from urlparse import urljoin
-except:
+except ImportError:
     from urllib.parse import urljoin
 
 logger = logging.getLogger()
+
 
 def process_response(response):
     if response.status_code != 200:
         raise SolrError(response.reason)
     try:
         response_content = json.loads(response.text)
-    except:
+    except Exception:
         logger.exception('Failed to parse solr text')
         raise SolrError("Parsing Error: %s" % response.text)
 
@@ -80,10 +81,13 @@ class SolrRequest(object):
             request_headers.update(headers)
 
         # Refresh our list of hosts
-        if (self.zookeeper and
+        should_refresh = (
+            self.zookeeper and
             not is_retry and
             self._last_request and
-            ((time.time() - self._last_request) / 60) > self.refresh_frequency):
+            ((time.time() - self._last_request) / 60) > self.refresh_frequency
+        )
+        if should_refresh:
             self.attempt_zookeeper_refresh()
 
         request_params = {

@@ -40,7 +40,6 @@ class SolrRequest(object):
         self.refresh_frequency = refresh_frequency
         self.servers = []
         self.timeout = timeout
-        self.current_hosts = self.master_hosts  # Backwards Compat
         self._zookeeper = None
         self._last_request = None
         self.attempt_zookeeper_refresh()
@@ -51,13 +50,15 @@ class SolrRequest(object):
             self._zookeeper = Zookeeper(self.zookeeper_hosts)
         return self._zookeeper
 
+    @property
+    def current_hosts(self):
+        return self.master_hosts
+
     def attempt_zookeeper_refresh(self):
-        zk = self.zookeeper
-        if zk:
+        if self.zookeeper:
             logger.debug('Fetching solr from zookeeper')
             try:
-                self.master_hosts = zk.get_active_hosts()
-                self.current_hosts = self.master_hosts  # backward compat
+                self.master_hosts = self.zookeeper.get_active_hosts()
                 logger.info(
                     'Got solr nodes from zookeeper: %s',
                     ','.join(self.master_hosts)

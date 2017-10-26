@@ -35,7 +35,7 @@ class SolrRequest(object):
         self.client = requests.Session()
         self.master_hosts = solr_hosts
         self.zookeeper_hosts = zookeeper_hosts
-        self.refresh_frequency = refresh_frequency
+        self.refresh_frequency = refresh_frequency  # minutes
         self.servers = []
         self.timeout = timeout
         self._zookeeper = None
@@ -62,9 +62,8 @@ class SolrRequest(object):
                     ','.join(self.master_hosts)
                 )
                 if not self.master_hosts:
-                    logger.error('Unable to find any solr nodes to make requests to')
-                    raise SolrError("zookeeper reporting all SOLR nodes as down")
-                return True
+                    logger.error('Unable to find any solr nodes to make requests to. Zookeeper reporting all SOLR nodes as down')
+                return bool(self.master_hosts)
             except Exception:
                 logger.exception('Failing to retrieve new SOLR hosts from zookeeper')
         return False
@@ -79,6 +78,14 @@ class SolrRequest(object):
         if headers:
             request_headers.update(headers)
 
+        request_params = {
+            'wt': 'json',
+            'omitHeader': 'true',
+            'json.nl': 'map'
+        }
+        if params:
+            request_params.update(params)
+
         # Refresh our list of hosts
         should_refresh = (
             self.zookeeper and
@@ -88,14 +95,6 @@ class SolrRequest(object):
         )
         if should_refresh:
             self.attempt_zookeeper_refresh()
-
-        request_params = {
-            'wt': 'json',
-            'omitHeader': 'true',
-            'json.nl': 'map'
-        }
-        if params:
-            request_params.update(params)
 
         response = None
         for host in random.sample(self.master_hosts, len(self.master_hosts)):

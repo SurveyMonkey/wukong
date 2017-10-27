@@ -97,7 +97,7 @@ class Zookeeper(object):
             hosts = _get_hosts_from_state(state)
             active_hosts[collection_name] |= hosts
 
-        logger.error('Got aliases: %s', aliases)
+        logger.debug('Got aliases: %s', aliases)
         for alias_name, member_string in aliases.get('collection', {}).items():
             members = member_string.split(',')
 

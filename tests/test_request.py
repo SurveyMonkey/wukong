@@ -33,7 +33,8 @@ class TestSolrRequest(unittest.TestCase):
             'fake_path', {"fake_param": "fake_value"}, 'POST',
             body={
      			"fake_data": "fake_value"
-     		}
+		},
+            headers=None
         )
 
     def test_request_get(self):
@@ -46,7 +47,7 @@ class TestSolrRequest(unittest.TestCase):
          	)
 
         mock_request.assert_called_once_with(
-                'fake_path', {"fake_param": "fake_value"}, 'GET'
+                'fake_path', {"fake_param": "fake_value"}, 'GET', headers=None
         )
 
     def test_request_request(self):
@@ -154,32 +155,32 @@ class TestSolrRequest(unittest.TestCase):
 
             mock_request.assert_any_call(
                 'GET', 'http://localsolr:8080/solr/fake_path',
+                data={"fake_body": "fake_value"},
+                headers={'content-type': 'application/json'},
                 params={
                     "fake_params": "fake_value",
                     'wt': 'json',
                     'omitHeader': 'true',
                     'json.nl': 'map'
                 },
-                headers={'content-type': 'application/json'},
-                data={"fake_body": "fake_value"},
                 timeout=15
             )
 
             mock_request.assert_any_call(
                 'GET', 'http://localsolr:7070/solr/fake_path',
+                data={"fake_body": "fake_value"},
+                headers={'content-type': 'application/json'},
                 params={
                     "fake_params": "fake_value",
                     'wt': 'json',
                     'omitHeader': 'true',
                     'json.nl': 'map'
                 },
-                headers={'content-type': 'application/json'},
-                data={"fake_body": "fake_value"},
                 timeout=15
             )
 
             solr_error = cm.exception
-            self.assertEqual(str(solr_error), "Test Error" )
+            self.assertEqual(str(solr_error), "Unable to fetch from any SOLR nodes" )
 
     def test_request_request__malformed_response(self):
         client = SolrRequest(["http://localsolr:8080/solr/"])
@@ -253,6 +254,5 @@ class TestSolrRequest(unittest.TestCase):
                 timeout=15
             )
 
-
             solr_error = cm.exception
-            self.assertEqual(str(solr_error), "Server down!" )
+            self.assertEqual(str(solr_error), "Unable to fetch from any SOLR nodes" )

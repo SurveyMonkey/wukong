@@ -13,7 +13,7 @@ try:
 except ImportError: # pragma: no cover
     from urllib.parse import urljoin
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def process_response(response):
@@ -32,6 +32,14 @@ class SolrRequest(object):
     """
 
     def __init__(self, solr_hosts, zookeeper_hosts=None, timeout=15, refresh_frequency=2):
+        """
+        Initialize our Request interface instance.
+            :param solr_hosts: [(str)] List of SOLR hostnames.
+            :param zookeeper_hosts: [(str)] (Optional) List of zookeeper hostnames.
+            :param timeout: int - Timeout in seconds for requests to SOLR. (Default: 15s) 
+            :param refresh_frequency: int - Frequency in seconds to refresh the SOLR hostnames from zookeeper 
+                (time since the last refresh, but synchronous with a request).(Default: 2s)
+        """
         self.client = requests.Session()
         self.master_hosts = solr_hosts
         self.zookeeper_hosts = zookeeper_hosts

@@ -37,8 +37,8 @@ class SolrRequest(object):
             :param solr_hosts: [(str)] List of SOLR hostnames.
             :param zookeeper_hosts: [(str)] (Optional) List of zookeeper hostnames.
             :param timeout: int - Timeout in seconds for requests to SOLR. (Default: 15s) 
-            :param refresh_frequency: int - Frequency in seconds to refresh the SOLR hostnames from zookeeper 
-                (time since the last refresh, but synchronous with a request).(Default: 2s)
+            :param refresh_frequency: int - Frequency in minutes to refresh the SOLR hostnames from zookeeper 
+                (time since the last refresh, but synchronous with a request).(Default: 2m)
         """
         self.client = requests.Session()
         self.master_hosts = solr_hosts

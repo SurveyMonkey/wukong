@@ -7,6 +7,14 @@ import json
 
 logger = logging.getLogger(__name__)
 
+def _add_scheme_if_not_there(url, scheme='http'):
+    if not (
+        url.startswith('http://')
+        or url.startswith('https://')
+    ):
+        url = '{}://{}'.format(scheme, url)
+
+    return url
 
 class SolrAPI(object):
 
@@ -73,7 +81,11 @@ class SolrAPI(object):
             self.zookeeper_hosts = None
 
         logger.info('Connected to solr hosts %s', solr_hosts)
-        self.solr_hosts = ["http://%s/solr/" % host for host in solr_hosts]
+
+        self.solr_hosts = [
+            "{}/solr/".format(_add_scheme_if_not_there(host))
+            for host in solr_hosts
+        ]
 
         self.solr_collection = solr_collection
 

@@ -1,6 +1,13 @@
 
 #Release Notes
 
+0.5.0
+==========
+- Simplify the method of making requests, and add logging so it's more visible what's happening (#18)
+- Don't log debugging messages as error messages (#19)
+- Broaden Travis support (#17)
+- Make sure a scheme is always on the solr request (#20)
+
 0.4.0
 ==========
 - Add ability to update extraparams like omitHeader for solr requests

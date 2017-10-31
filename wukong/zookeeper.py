@@ -20,9 +20,7 @@ def _get_hosts_from_state(state):
         replicas = shard_data['replicas']
         for replica, replica_data in replicas.items():
             if replica_data['state'] == 'active':
-                node_url = replica_data['base_url'][:-5]  # strip /solr
-                node_url = node_url.replace('http://', '')
-                active_nodes.add(node_url)
+                active_nodes.add(replica_data['base_url'])
 
     return active_nodes
 
@@ -129,6 +127,6 @@ class Zookeeper(object):
         if collection_name is not None:
             return list(active_hosts.get(collection_name, []))
         else:
-            return list(itertools.chain.from_iterable(
-                self._get_active_hosts().values()
-            ))
+            return list(set(itertools.chain.from_iterable(
+                active_hosts.values()
+            )))

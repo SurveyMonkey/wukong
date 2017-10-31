@@ -74,7 +74,7 @@ class SolrRequest(object):
 
     def attempt_zookeeper_refresh(self):
         if self.zookeeper:
-            logger.debug('Fetching solr from zookeeper')
+            logger.debug('Fetching solr hosts from zookeeper')
             try:
                 self.master_hosts = self.zookeeper.get_active_hosts()
                 logger.info(
@@ -118,13 +118,9 @@ class SolrRequest(object):
 
         response = None
         for host in random.sample(self.master_hosts, len(self.master_hosts)):
-            full_path = urljoin(host, path)
+            full_path = '/'.join(s.strip('/') for s in [host, path])
             try:
-                logger.debug(
-                    'Sending request to solr. host="%s" path="%s"',
-                    host,
-                    path
-                )
+                logger.debug('Sending request to solr. route="%s"', full_path)
 
                 self._last_request = time.time()
 
@@ -138,10 +134,8 @@ class SolrRequest(object):
                 )
 
                 logger.debug(
-                    'Retrieved response from SOLR. host="%s" path="%s" '
-                    'status_code="%s"',
-                    host,
-                    path,
+                    'Retrieved response from SOLR. route="%s" status_code="%s"',
+                    full_path,
                     response.status_code
                 )
 

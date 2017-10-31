@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class SolrAPI(object):
 
     def __init__(self, solr_hosts, solr_collection,
-                 zookeeper_hosts=None, timeout=15):
+                 zookeeper_hosts=None, timeout=15, zookeeper_timeout=5):
         """
         Do all the interactions with SOLR server
         (e.g. update, select, get and delete)
@@ -35,7 +35,7 @@ class SolrAPI(object):
                 'Getting solr hosts from zookeeper for collection %s',
                 solr_collection
             )
-            zk = Zookeeper(zookeeper_hosts)
+            zk = Zookeeper(zookeeper_hosts, zookeeper_timeout)
             solr_hosts = zk.get_active_hosts(collection_name=solr_collection)
 
         if solr_hosts is None or solr_collection is None:

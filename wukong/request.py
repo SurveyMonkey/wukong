@@ -31,7 +31,14 @@ class SolrRequest(object):
     Handle requests to SOLR and response from SOLR
     """
 
-    def __init__(self, solr_hosts, zookeeper_hosts=None, timeout=15, refresh_frequency=2):
+    def __init__(
+        self,
+        solr_hosts,
+        zookeeper_hosts=None,
+        timeout=15,
+        refresh_frequency=2,
+        zookeeper_timeout=5
+    ):
         """
         Initialize our Request interface instance.
             :param solr_hosts: [(str)] List of SOLR hostnames.
@@ -39,6 +46,7 @@ class SolrRequest(object):
             :param timeout: int - Timeout in seconds for requests to SOLR. (Default: 15s) 
             :param refresh_frequency: int - Frequency in minutes to refresh the SOLR hostnames from zookeeper 
                 (time since the last refresh, but synchronous with a request).(Default: 2m)
+            :param zookeeper_timeout: int - Timeout in seconds for requests to SOLR (Default: 5s)
         """
         self.client = requests.Session()
         self.master_hosts = solr_hosts
@@ -48,12 +56,16 @@ class SolrRequest(object):
         self.timeout = timeout
         self._zookeeper = None
         self._last_request = None
+        self.zookeeper_timeout = zookeeper_timeout
         self.attempt_zookeeper_refresh()
 
     @property
     def zookeeper(self):
         if self._zookeeper is None and self.zookeeper_hosts:
-            self._zookeeper = Zookeeper(self.zookeeper_hosts)
+            self._zookeeper = Zookeeper(
+                self.zookeeper_hosts,
+                self.zookeeper_timeout
+            )
         return self._zookeeper
 
     @property

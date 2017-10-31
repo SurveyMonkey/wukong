@@ -20,7 +20,8 @@ class SolrDocMetaClass(type):
                 solr_hosts=self.solr_hosts,
                 solr_collection=self.collection_name,
                 zookeeper_hosts=self.zookeeper_hosts,
-                timeout=self.request_timeout
+                timeout=self.request_timeout,
+                zookeeper_timeout=self.zookeeper_timeout
             )
         return self._solr
 
@@ -148,6 +149,7 @@ class SolrDoc(with_metaclass(SolrDocMetaClass, object)):
     zookeeper_hosts = None
     collection_name = None
     request_timeout = 15
+    zookeeper_timeout = 5
 
     @property
     def solr(self):

@@ -1,6 +1,10 @@
 
 #Release Notes
 
+0.5.1
+==========
+- Only add /solr/ to the end of a solr url if it isn't already there
+
 0.5.0
 ==========
 - Simplify the method of making requests, and add logging so it's more visible what's happening (#18)

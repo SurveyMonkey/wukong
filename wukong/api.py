@@ -16,6 +16,15 @@ def _add_scheme_if_not_there(url, scheme='http'):
 
     return url
 
+def _format_solr_url(url):
+    url = _add_scheme_if_not_there(url)
+    if not url.endswith('/solr') and not url.endswith('/solr/'):
+        url = '{}/solr/'.format(url)
+    if not url.endswith('/'):
+        url = '{}/'.format(url)
+
+    return url
+
 class SolrAPI(object):
 
     def __init__(self, solr_hosts, solr_collection,
@@ -82,10 +91,7 @@ class SolrAPI(object):
 
         logger.info('Connected to solr hosts %s', solr_hosts)
 
-        self.solr_hosts = [
-            "{}/solr/".format(_add_scheme_if_not_there(host))
-            for host in solr_hosts
-        ]
+        self.solr_hosts = [_format_solr_url(host) for host in solr_hosts]
 
         self.solr_collection = solr_collection
 

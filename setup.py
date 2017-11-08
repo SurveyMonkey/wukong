@@ -13,7 +13,7 @@ except:
     README = read('README.md')
     CHANGES = read('CHANGES.md')
 
-version = '0.5.0'
+version = '0.5.1'
 
 setup(
     name="wukong",

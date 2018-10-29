@@ -7,15 +7,15 @@
 
 Wukong offers an ORM query engine for Solr and Solr Cloud.
 
-##Installation
+## Installation
 ```
 	pip install wukong
 ```
 
-##Usage
+## Usage
 
 
-###Create Solr Collection
+### Create Solr Collection
 Before you use wukong, make sure you already created your collection on SolrCloud. For example,
 ```
 	curl http://localhost:8080/solr/admin/collections?action=CREATE&name=users&numShards=1&replicationFactor=2
@@ -33,7 +33,7 @@ A sample schema can be like:
 </fields>
 ```
 
-###Create a model class for Solr collection
+### Create a model class for Solr collection
 Create a class for your Solr collection by extending the class `SolrDoc`. For example,
 
 ```
@@ -53,7 +53,7 @@ class User(SolrDoc):
 You can overide existing methods to fit your business logic, like `validate_schema_fields`, `get_data_for_solr`.
 
 
-###Use Solr QueryManger
+### Use Solr QueryManger
 
 Creat a document
 ```
@@ -123,7 +123,7 @@ Batch delete documents
 User.documents.filter(name__eq="Test Name").all().delete()
 ```
 
-##Documentations
+## Documentations
 
 Detailed docs can be found at http://wukong.readthedocs.io/en/latest/
 

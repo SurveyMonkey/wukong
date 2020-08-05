@@ -23,6 +23,7 @@ setup(
     description="An ORM Client library for SolrCloud",
     keywords="solr cloud solrcloud client python orm",
     url="https://github.com/SurveyMonkey/wukong",
+    long_description_content_type="text/markdown",
     long_description='%s\n\n%s' % (README, CHANGES),
     install_requires=[
         "requests",

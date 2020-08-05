@@ -1,8 +1,9 @@
 
 #Release Notes
 
-0.5.2
+1.0.0
 ==========
+- Removed support for Python versions < 3.5 and pypy
 - Use POST instead of GET for /select API calls in order to avoid
   exceeding the max uri length for long queries (#26)
 

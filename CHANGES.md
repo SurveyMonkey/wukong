@@ -1,6 +1,11 @@
 
 #Release Notes
 
+0.5.2
+==========
+- Use POST instead of GET for /select API calls in order to avoid
+  exceeding the max uri length for long queries (#26)
+
 0.5.1
 ==========
 - Only add /solr/ to the end of a solr url if it isn't already there

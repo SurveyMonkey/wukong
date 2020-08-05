@@ -117,7 +117,7 @@ class TestSolrAPI(unittest.TestCase):
             assert not mock_method.called
 
     def test_api_select(self):
-        with mock.patch('wukong.request.SolrRequest.get') as mock_method:
+        with mock.patch('wukong.request.SolrRequest.post') as mock_method:
             fake_response = {
                 "response":{
                     "docs":[
@@ -148,7 +148,7 @@ class TestSolrAPI(unittest.TestCase):
             self.assertEqual(result['docs'][0]["test_field"], "Test Value")
 
     def test_api_select__group_by(self):
-        with mock.patch('wukong.request.SolrRequest.get') as mock_method:
+        with mock.patch('wukong.request.SolrRequest.post') as mock_method:
             fake_response = {
                 "grouped":{
                     "city":{
@@ -186,7 +186,7 @@ class TestSolrAPI(unittest.TestCase):
             self.assertEqual(result['groups']['city']['groups'][0]["doclist"], [])
 
     def test_api_select__group_by(self):
-        with mock.patch('wukong.request.SolrRequest.get') as mock_method:
+        with mock.patch('wukong.request.SolrRequest.post') as mock_method:
             fake_response = {
                 "grouped":{
                     "city":{

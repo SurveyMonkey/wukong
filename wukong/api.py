@@ -192,7 +192,7 @@ class SolrAPI(object):
         if kwargs:
             query_dict.update(kwargs)
 
-        response = self.client.get(
+        response = self.client.post(
             self._get_collection_url('select'),
             params=query_dict
         )

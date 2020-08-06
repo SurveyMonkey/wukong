@@ -116,7 +116,7 @@ class TestSolrAPI(unittest.TestCase):
 
             assert not mock_method.called
 
-    def test_api_select(self):
+    def test_api_select__with_extra_kwarg(self):
         with mock.patch('wukong.request.SolrRequest.post') as mock_method:
             fake_response = {
                 "response":{
@@ -138,16 +138,16 @@ class TestSolrAPI(unittest.TestCase):
             result = self.api.select(query_dict, extra="extra_value")
             mock_method.assert_called_once_with(
                 'test_collection/select',
-                params={
+                body=json.dumps({'params': {
                     "q":"test_field:test_value",
                     "rows":10,
                     "extra": "extra_value"
-                }
+                }})
             )
             self.assertEqual(result['docs'][0]["pk"], "Test PK")
             self.assertEqual(result['docs'][0]["test_field"], "Test Value")
 
-    def test_api_select__group_by(self):
+    def test_api_select__group_by_with_extra_kwarg(self):
         with mock.patch('wukong.request.SolrRequest.post') as mock_method:
             fake_response = {
                 "grouped":{
@@ -173,19 +173,19 @@ class TestSolrAPI(unittest.TestCase):
             result = self.api.select(query_dict, groups=True, extra="extra_value")
             mock_method.assert_called_once_with(
                 'test_collection/select',
-                params={
+                body=json.dumps({'params': {
                     "q":"test_field:test_value",
                     "rows":10,
                     "group": "on",
                     "group.field": "city",
                     "extra": "extra_value"
-                }
+                }})
             )
 
             self.assertEqual(result['groups']['city']['groups'][0]["groupValue"], 100)
             self.assertEqual(result['groups']['city']['groups'][0]["doclist"], [])
 
-    def test_api_select__group_by(self):
+    def test_api_select__group_by_with_facets(self):
         with mock.patch('wukong.request.SolrRequest.post') as mock_method:
             fake_response = {
                 "grouped":{
@@ -221,14 +221,14 @@ class TestSolrAPI(unittest.TestCase):
             result = self.api.select(query_dict, groups=True, facets=True)
             mock_method.assert_called_once_with(
                 'test_collection/select',
-                params={
+                body=json.dumps({'params': {
                     "q":"test_field:test_value",
                     "rows":10,
                     "group": "on",
                     "group.field": "city",
                     "facet": "on",
                     "facet.field": ["template_ids"]
-                }
+                }})
             )
             self.assertEqual(result['facets']['facet_fields']["template_ids"]["60"], 50)
             self.assertEqual(result['groups']['city']['groups'][0]["groupValue"], 100)

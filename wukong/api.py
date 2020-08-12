@@ -194,7 +194,7 @@ class SolrAPI(object):
 
         response = self.client.post(
             self._get_collection_url('select'),
-            params=query_dict
+            body=json.dumps({'params': query_dict})
         )
 
         data = {}

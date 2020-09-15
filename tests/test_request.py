@@ -2,7 +2,6 @@ import mock
 from requests.exceptions import ConnectionError, ReadTimeout
 from wukong.request import SolrRequest
 from wukong.errors import *
-import pytest
 import json
 
 try:
@@ -214,11 +213,54 @@ class TestSolrRequest(unittest.TestCase):
             solr_error = cm.exception
             self.assertEqual(str(solr_error), "Parsing Error: Malformed Response" )
 
-    def test_request_request__server_down(self):
+    def test_request_request__server_down_connection_error(self):
 
         with mock.patch('requests.sessions.Session.request') as mock_request:
             def request(*args, **kwargs):
                 raise ConnectionError("Server down!")
+
+            mock_request.side_effect = request
+            with self.assertRaises(SolrError) as cm:
+                response = self.client.request(
+                    'fake_path',
+                    {"fake_params": "fake_value"},
+                    'GET',
+                    body={"fake_body": "fake_value"}
+                )
+
+            mock_request.assert_any_call(
+                'GET', 'http://localsolr:8080/solr/fake_path',
+                params={
+                    "fake_params": "fake_value",
+                    'wt': 'json',
+                    'omitHeader': 'true',
+                    'json.nl': 'map'
+                },
+                headers={'content-type': 'application/json'},
+                data={"fake_body": "fake_value"},
+                timeout=15
+            )
+            mock_request.assert_any_call(
+                'GET', 'http://localsolr:7070/solr/fake_path',
+                params={
+                    "fake_params": "fake_value",
+                    'wt': 'json',
+                    'omitHeader': 'true',
+                    'json.nl': 'map'
+                },
+                headers={'content-type': 'application/json'},
+                data={"fake_body": "fake_value"},
+                timeout=15
+            )
+
+            solr_error = cm.exception
+            self.assertEqual(str(solr_error), "Unable to fetch from any SOLR nodes" )
+
+    def test_request_request__server_down_read_timeout(self):
+
+        with mock.patch('requests.sessions.Session.request') as mock_request:
+            def request(*args, **kwargs):
+                raise ReadTimeout("Server down!")
 
             mock_request.side_effect = request
             with self.assertRaises(SolrError) as cm:

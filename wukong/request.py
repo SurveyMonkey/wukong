@@ -1,7 +1,7 @@
 import logging
 
 from wukong.zookeeper import Zookeeper
-from requests.exceptions import ConnectionError
+from requests.exceptions import RequestException
 from wukong.errors import SolrError
 import requests
 import random
@@ -151,7 +151,7 @@ class SolrRequest(object):
                     )
                     response = None
 
-            except ConnectionError:
+            except RequestException:
                 response = None
                 logger.info(
                     'Failed to connect to SOLR',

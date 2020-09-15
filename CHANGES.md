@@ -1,6 +1,10 @@
 
 #Release Notes
 
+1.1.0
+==========
+- Catch RequestsException Instead Of Connection Errors To Allow For Retries during timeouts (#30)
+
 1.0.1
 ==========
 - search(): _actually_ send the query_dict in the request body as was intended in 1.0.0 (missed a cherry-pick)
